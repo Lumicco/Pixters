@@ -25,4 +25,3 @@ void Hunger::hungerDown()
 {
     this->setVisible(false);
 }
-

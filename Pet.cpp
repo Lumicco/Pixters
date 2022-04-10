@@ -5,7 +5,7 @@
 Pet::Pet(QGraphicsItem *parent): QGraphicsPixmapItem(parent)
 {
     //set item image and size
-    setPixmap(QPixmap(":/images/Resources/Pets/Tamagotchi1.png").scaledToHeight(140));
+    setPixmap(QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140));
 
     //connect
     QTimer * timer = new QTimer(); //slot executes everytime timer reaches 0
@@ -32,12 +32,12 @@ void Pet::move()
     if (rand() % 2 + 1 == 1)
     {
         setPos(x()-20, y());
-        setPixmap(QPixmap(":/images/Resources/Pets/Tamagotchi1.png").scaledToHeight(140));
+        setPixmap(QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140));
     }
     else
     {
         setPos(x()+20, y());
-        setPixmap((QPixmap(":/images/Resources/Pets/Tamagotchi1.png").scaledToHeight(140)).transformed(QTransform().scale(-1, 1)));
+        setPixmap((QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140)).transformed(QTransform().scale(-1, 1)));
     }
 }
 

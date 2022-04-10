@@ -1,24 +1,28 @@
 <RCC>
-    <qresource prefix="/sounds">
-        <file>Resources/Sounds/background_music.wav</file>
-    </qresource>
     <qresource prefix="/images">
         <file>Resources/Background.png</file>
         <file>Resources/Death.png</file>
+        <file>Resources/Feed.png</file>
+        <file>Resources/Game_Over.png</file>
         <file>Resources/Happiness1.png</file>
         <file>Resources/Happiness2.png</file>
         <file>Resources/Happiness3.png</file>
         <file>Resources/Heart.png</file>
         <file>Resources/Horse.png</file>
+        <file>Resources/Medicine.png</file>
+        <file>Resources/Pixters.png</file>
+        <file>Resources/Sign.png</file>
         <file>Resources/Strawberry.png</file>
-        <file>Resources/Pets/Tamagotchi1.png</file>
-        <file>Resources/Pets/Tamagotchi2.png</file>
-        <file>Resources/Pets/Tamagotchi3.png</file>
-        <file>Resources/Pets/Tamagotchi4.png</file>
-        <file>Resources/Pets/Tamagotchi5.png</file>
-        <file>Resources/Pets/Tamagotchi6.png</file>
-        <file>Resources/Pets/Tamagotchi7.png</file>
-        <file>Resources/Pets/Tamagotchi8.png</file>
+        <file>Resources/Pets/Pixter1.png</file>
+        <file>Resources/Pets/Pixter2.png</file>
+        <file>Resources/Pets/Pixter3.png</file>
+        <file>Resources/Pets/Pixter4.png</file>
+        <file>Resources/Pets/Pixter5.png</file>
+        <file>Resources/Pets/Pixter6.png</file>
+        <file>Resources/Pets/Pixter7.png</file>
+        <file>Resources/Pets/Pixter8.png</file>
     </qresource>
-    <qresource prefix="/new/prefix1"/>
+    <qresource prefix="/sounds">
+        <file>Resources/Sounds/background_music.wav</file>
+    </qresource>
 </RCC>
