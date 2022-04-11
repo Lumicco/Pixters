@@ -5,19 +5,32 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QLabel>
+#include <QMediaPlayer>
 #include "Pet.h"
 #include "Meter.h"
 
 class Session: public QGraphicsView
 {
+    Q_OBJECT //needs Q_OBJECT macro
+
     public:
         Session(QWidget * parent=0);
-        void gameOver();
+        QGraphicsScene * m_scene;
 
-        QGraphicsScene * scene;
-        Pet * pet;
-        QLabel * name;
-        Meter * meter;
+        QPushButton * m_play;
+
+        Pet * m_pet;
+        QLabel * m_name;
+        Meter * m_meter;
+        QMediaPlayer * m_music;
+
+        QPushButton * m_play_again;
+        QPushButton * m_quit;
+
+    public slots:
+        void start();
+        void gameOver();
+        void restartSession();
 };
 
 #endif // SESSION_H

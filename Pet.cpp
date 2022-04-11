@@ -20,6 +20,7 @@ void Pet::move()
     position = scenePos();
     int posX = position.x();
 
+    //prevent pet going out of bounds
     if(posX <= 20)
     {
         setPos(x()+20, y());
@@ -29,6 +30,7 @@ void Pet::move()
         setPos(x()-20, y());
     }
 
+    //move pet randomly left and right, mirror icon when going right
     if (rand() % 2 + 1 == 1)
     {
         setPos(x()-20, y());

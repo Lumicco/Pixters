@@ -7,7 +7,7 @@
 
 class Health: public QObject, public QGraphicsPixmapItem
 {
-    Q_OBJECT
+    Q_OBJECT //needs Q_OBJECT macro
 
     private:
         int m_health_nb = 3;

@@ -7,7 +7,7 @@
 
 class Hunger: public QObject, public QGraphicsPixmapItem
 {
-    Q_OBJECT
+    Q_OBJECT //needs Q_OBJECT macro
 
     private:
         int m_berry_nb = 3;

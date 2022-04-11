@@ -11,12 +11,14 @@
 
 class Meter: public QObject
 {
-    Q_OBJECT
+    Q_OBJECT //needs Q_OBJECT macro
 
     public:
         Meter(QGraphicsScene * scene=0);
+        ~Meter();
         QPushButton * m_feed;
-        QTimer * m_timer;
+        QTimer * m_timer1;
+        QTimer * m_timer2;
         Health * m_heart[3];
         Hunger * m_berry[3];
         Satisfaction * m_morale;
@@ -27,5 +29,6 @@ class Meter: public QObject
         void starve();
         void happinessChange();
 };
+
 
 #endif // METER_H

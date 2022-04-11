@@ -11,7 +11,6 @@
         <file>Resources/Horse.png</file>
         <file>Resources/Medicine.png</file>
         <file>Resources/Pixters.png</file>
-        <file>Resources/Sign.png</file>
         <file>Resources/Strawberry.png</file>
         <file>Resources/Pets/Pixter1.png</file>
         <file>Resources/Pets/Pixter2.png</file>
@@ -21,8 +20,18 @@
         <file>Resources/Pets/Pixter6.png</file>
         <file>Resources/Pets/Pixter7.png</file>
         <file>Resources/Pets/Pixter8.png</file>
+        <file>Resources/Play_Again.png</file>
+        <file>Resources/Quit.png</file>
     </qresource>
     <qresource prefix="/sounds">
         <file>Resources/Sounds/background_music.wav</file>
+        <file>Resources/Sounds/beep.wav</file>
+        <file>Resources/Sounds/beep2.wav</file>
+        <file>Resources/Sounds/brrrr.wav</file>
+        <file>Resources/Sounds/bweep.wav</file>
+        <file>Resources/Sounds/bweep2.wav</file>
+        <file>Resources/Sounds/click.wav</file>
+        <file>Resources/Sounds/click2.wav</file>
+        <file>Resources/Sounds/eating.wav</file>
     </qresource>
 </RCC>
