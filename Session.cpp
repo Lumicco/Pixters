@@ -3,6 +3,8 @@
 #include <QImage>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QInputDialog>
+#include <QSqlDatabase>
 
 #include <QDebug>
 
@@ -22,32 +24,81 @@ Session::Session(QWidget * parent)
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Pixters.png")));
 
     //add invisible start button over logo
-    m_play = new QPushButton();
-    m_play->setGeometry(120, 165, 430, 205);
-    m_play->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
-    m_play->setCursor(Qt::PointingHandCursor);
+    m_start = new QPushButton();
+    m_start->setGeometry(120, 165, 430, 205);
+    m_start->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+    m_start->setCursor(Qt::PointingHandCursor);
 
-    m_play->show();
-    m_scene->addWidget(m_play);
+    m_start->show();
+    m_scene->addWidget(m_start);
 
-    //restart session when play again button is clicked
-    connect(m_play, SIGNAL(clicked()), this, SLOT(start()));
+    //play title screen music
+    QAudioOutput * audioOutput = new QAudioOutput(this);
+    m_music = new QMediaPlayer(this);
+    m_music->setAudioOutput(audioOutput);
+    audioOutput->setVolume(50);
+    m_music->setSource(QUrl("qrc:/sounds/Resources/Sounds/title_screen.wav"));
+    m_music->setLoops(QMediaPlayer::Infinite);
+    m_music->play();
+
+    //start session setup when button is clicked
+    connect(m_start, SIGNAL(clicked()), this, SLOT(setup()));
+}
+
+void Session::setup()
+{
+    if(m_start != NULL)
+    {
+        m_start->hide();
+    }
+
+    //enter username
+    m_username = QInputDialog::getText(this, tr("Entrez votre nom"),
+                                             tr("Votre nom:"), QLineEdit::Normal);
+
+    //choose favourite animal
+    QStringList items;
+    items << tr("Papillon de mer") << tr("Chien") << tr("Chenille") << tr("Papillon")
+          << tr("Serpent") << tr("Chat") << tr("Lézard") << tr("Autre");
+
+    m_pet_type = QInputDialog::getItem(this, tr("Quel est votre animal préféré ?"),
+                                             tr("Votre animal préféré:"), items, 0, false);
+
+    //enter pet name
+    m_pet_name = QInputDialog::getText(this, tr("Entrez le nom de votre pixter"),
+                                             tr("Le nom de votre pixter:"), QLineEdit::Normal);
+
+    //connect to database
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("pixters");
+    db.setUserName("root");
+    db.setPassword("AT2jgTMEx-cHeIT9");
+
+    if(db.open())
+    {
+        qDebug() << "success";
+    }
+
+    //start session after last popup
+    start();
 }
 
 void Session::start()
 {
-    if(m_play != NULL)
-    {
-        qDebug() << "null";
-        m_play->hide();
-    }
-
     //set background
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Background.png")));
 
     //create the pet
     m_pet = new Pet();
     m_pet->setPos(265,170);
+
+    //set pet name to name entered by user
+    if(!m_pet_name.isEmpty())
+    {
+        m_pet->setName(m_pet_name);
+    }
+
 
     //create label with name of pet
     m_name = new QLabel();
@@ -66,10 +117,6 @@ void Session::start()
     m_scene->addWidget(m_name);
 
     //play background music
-    QAudioOutput * audioOutput = new QAudioOutput(this);
-    m_music = new QMediaPlayer(this);
-    m_music->setAudioOutput(audioOutput);
-    audioOutput->setVolume(50);
     m_music->setSource(QUrl("qrc:/sounds/Resources/Sounds/background_music.wav"));
     m_music->setLoops(QMediaPlayer::Infinite);
     m_music->play();
@@ -83,10 +130,12 @@ void Session::gameOver()
     //remove items from scene
     delete(m_meter);
     m_scene->clear();
-    m_play = NULL;
+    m_start = NULL;
 
-    //stop music
-    m_music->stop();
+    //play background music
+    m_music->setSource(QUrl("qrc:/sounds/Resources/Sounds/game_over.wav"));
+    m_music->setLoops(1);
+    m_music->play();
 
     //change background image
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Game_Over.png")));

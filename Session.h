@@ -17,17 +17,23 @@ class Session: public QGraphicsView
         Session(QWidget * parent=0);
         QGraphicsScene * m_scene;
 
-        QPushButton * m_play;
+        QPushButton * m_start;
+
+        QString m_username;
+        QString m_pet_type;
+        QString m_pet_name;
 
         Pet * m_pet;
         QLabel * m_name;
         Meter * m_meter;
+
         QMediaPlayer * m_music;
 
         QPushButton * m_play_again;
         QPushButton * m_quit;
 
     public slots:
+        void setup();
         void start();
         void gameOver();
         void restartSession();

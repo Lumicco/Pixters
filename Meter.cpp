@@ -9,7 +9,7 @@ Meter::Meter(QGraphicsScene * scene)
     m_feed = new QPushButton();
     m_feed->setIcon(QIcon(":/images/Resources/Feed.png"));
     m_feed->setIconSize(QSize(50, 50));
-    m_feed->move(10, -20);
+    m_feed->move(5, -20);
     m_feed->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));  //transparent background
     m_feed->setToolTip("Nourrir");
     m_feed->setCursor(Qt::PointingHandCursor);

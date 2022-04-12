@@ -11,7 +11,7 @@ class Pet: public QObject, public QGraphicsPixmapItem //item needs to derive fro
     Q_OBJECT //needs Q_OBJECT macro
 
     private:
-        QString m_name = "Valou";
+        QString m_name = "Choupette";
 
     public:
         Pet(QGraphicsItem *parent=0);

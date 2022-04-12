@@ -22,6 +22,7 @@
         <file>Resources/Pets/Pixter8.png</file>
         <file>Resources/Play_Again.png</file>
         <file>Resources/Quit.png</file>
+        <file>Resources/Play.png</file>
     </qresource>
     <qresource prefix="/sounds">
         <file>Resources/Sounds/background_music.wav</file>
@@ -33,5 +34,7 @@
         <file>Resources/Sounds/click.wav</file>
         <file>Resources/Sounds/click2.wav</file>
         <file>Resources/Sounds/eating.wav</file>
+        <file>Resources/Sounds/game_over.wav</file>
+        <file>Resources/Sounds/title_screen.wav</file>
     </qresource>
 </RCC>
