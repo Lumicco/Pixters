@@ -9,7 +9,7 @@ Meter::Meter(QGraphicsScene * scene)
     m_feed = new QPushButton();
     m_feed->setIcon(QIcon(":/images/Resources/Feed.png"));
     m_feed->setIconSize(QSize(50, 50));
-    m_feed->move(5, -20);
+    m_feed->move(0, -20);
     m_feed->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));  //transparent background
     m_feed->setToolTip("Nourrir");
     m_feed->setCursor(Qt::PointingHandCursor);
@@ -20,11 +20,23 @@ Meter::Meter(QGraphicsScene * scene)
 
     connect(m_feed, SIGNAL(clicked()), this, SLOT(eat()));
 
-    //add timer for stat change
-    m_timer1 = new QTimer();
-    connect(m_timer1, SIGNAL(timeout()), this, SLOT(starve()));
-    connect(m_timer1, SIGNAL(timeout()), this, SLOT(happinessChange()));
-    m_timer1->start(3000);
+    //create score display
+    m_score_display = new QLabel();
+    m_score_display->setText(QString("Score : ").append("%1").arg(m_score));
+    m_score_display->setTextFormat(Qt::PlainText);
+    m_score_display->setAlignment(Qt::AlignLeft);
+    m_score_display->setGeometry(270,10,250,30); //x, y, w, h
+    m_score_display->setAttribute(Qt::WA_TranslucentBackground);
+    m_score_display->setStyleSheet("font-size: 24px; font-weight: bold; font-family: 'Courier New', monospace; color: black");
+
+    m_score_display->show();
+
+    scene->addWidget(m_score_display);
+
+    //add timer for score change
+    m_score_timer = new QTimer();
+    connect(m_score_timer, SIGNAL(timeout()), this, SLOT(increaseScore()));
+    m_score_timer->start(1000);
 
     //add three hearts to scene
     int x = 20;
@@ -44,9 +56,9 @@ Meter::Meter(QGraphicsScene * scene)
     scene->addItem(m_heart[2]);
 
     //add timer for stat change
-    m_timer2 = new QTimer();
-    connect(m_timer2, SIGNAL(timeout()), this, SLOT(healthChange()));
-    m_timer2->start(5000);
+    m_health_timer = new QTimer();
+    connect(m_health_timer, SIGNAL(timeout()), this, SLOT(healthChange()));
+    m_health_timer->start(5000);
 
     //add three strawberries to scene
     x = 450;
@@ -65,12 +77,18 @@ Meter::Meter(QGraphicsScene * scene)
     scene->addItem(m_berry[2]);
 
     //add happiness indicator to scene
-    x = 300;
+    x = 310;
 
     m_morale = new Satisfaction();
-    m_morale->setPos(x,y-10);
+    m_morale->setPos(x,y);
 
     scene->addItem(m_morale);
+
+    //add timer for stat change
+    m_hunger_timer = new QTimer();
+    connect(m_hunger_timer, SIGNAL(timeout()), this, SLOT(starve()));
+    connect(m_hunger_timer, SIGNAL(timeout()), this, SLOT(happinessChange()));
+    m_hunger_timer->start(3000);
 }
 
 //destructor
@@ -78,8 +96,9 @@ Meter::~Meter()
 {
     //delete member objects
     delete(m_feed);
-    delete(m_timer1);
-    delete(m_timer2);
+    delete(m_hunger_timer);
+    delete(m_health_timer);
+    delete(m_score_timer);
 
     for(int i = 0; i < 3; i++)
     {
@@ -169,19 +188,35 @@ void Meter::happinessChange()
     //reduce happiness
     if(m_berry[0]->getHunger() == 3)
     {
-        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness3.png").scaledToHeight(80));
+        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness3.png").scaledToHeight(60));
     }
     else if(m_berry[0]->getHunger() == 2)
     {
-        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness2.png").scaledToHeight(80));
+        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness2.png").scaledToHeight(60));
     }
     else if(m_berry[0]->getHunger() == 1)
     {
-        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness1.png").scaledToHeight(80));
+        m_morale->setPixmap(QPixmap(":/images/Resources/Happiness1.png").scaledToHeight(60));
     }
     else if(m_heart[0]->getHealth() == 0)
     {
         m_morale->setPixmap(QPixmap(":/images/Resources/Death.png").scaledToHeight(80));
         m_morale->setDeath(true);
     }
+}
+
+void Meter::increaseScore()
+{
+    m_score++;
+    m_score_display->setText(QString("Score : ").append("%1").arg(m_score));
+}
+
+void Meter::setScore(int new_score)
+{
+    m_score = new_score;
+}
+
+int Meter::getScore()
+{
+    return m_score;
 }

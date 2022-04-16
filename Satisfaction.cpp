@@ -3,7 +3,7 @@
 Satisfaction::Satisfaction(QGraphicsItem *parent): QGraphicsPixmapItem(parent)
 {
     //set item image and size
-    setPixmap(QPixmap(":/images/Resources/Happiness3.png").scaledToHeight(80));
+    setPixmap(QPixmap(":/images/Resources/Happiness3.png").scaledToHeight(60));
 }
 
 void Satisfaction::setDeath(bool status)

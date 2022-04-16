@@ -2,10 +2,44 @@
 #include <QPointF>
 #include <QTimer>
 
-Pet::Pet(QGraphicsItem *parent): QGraphicsPixmapItem(parent)
+Pet::Pet(QString type, QGraphicsItem *parent): QGraphicsPixmapItem(parent), m_type(type)
 {
+
     //set item image and size
-    setPixmap(QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140));
+    if(m_type == "Papillon de mer")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter1.png");
+    }
+    else if(m_type == "Chien")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter2.png");
+    }
+    else if(m_type == "Chenille")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter3.png");
+    }
+    else if(m_type == "Papillon")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter4.png");
+    }
+    else if(m_type == "Serpent")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter5.png");
+    }
+    else if(m_type == "Autre")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter6.png");
+    }
+    else if(m_type == "Chat")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter7.png");
+    }
+    else if(m_type == "Lézard")
+    {
+        m_pixter.load(":/images/Resources/Pets/Pixter8.png");
+    }
+
+    setPixmap(m_pixter.scaledToHeight(140));
 
     //connect
     QTimer * timer = new QTimer(); //slot executes everytime timer reaches 0
@@ -34,12 +68,12 @@ void Pet::move()
     if (rand() % 2 + 1 == 1)
     {
         setPos(x()-20, y());
-        setPixmap(QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140));
+        setPixmap(m_pixter.scaledToHeight(140));
     }
     else
     {
         setPos(x()+20, y());
-        setPixmap((QPixmap(":/images/Resources/Pets/Pixter1.png").scaledToHeight(140)).transformed(QTransform().scale(-1, 1)));
+        setPixmap((m_pixter.scaledToHeight(140)).transformed(QTransform().scale(-1, 1)));
     }
 }
 
@@ -51,4 +85,14 @@ void Pet::setName(QString new_name)
 QString Pet::getName()
 {
     return m_name;
+}
+
+void Pet::setType(QString type)
+{
+    m_type = type;
+}
+
+QString Pet::getType()
+{
+    return m_type;
 }

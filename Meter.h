@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QObject>
 #include <QPushButton>
+#include <QLabel>
 #include <QTimer>
 #include "Health.h"
 #include "Hunger.h"
@@ -13,21 +14,33 @@ class Meter: public QObject
 {
     Q_OBJECT //needs Q_OBJECT macro
 
+    private:
+        QPushButton * m_feed;
+        QLabel * m_score_display;
+
+        QTimer * m_hunger_timer;
+        QTimer * m_health_timer;
+        QTimer * m_score_timer;
+
+        Health * m_heart[3];
+        Hunger * m_berry[3];
+
     public:
         Meter(QGraphicsScene * scene=0);
         ~Meter();
-        QPushButton * m_feed;
-        QTimer * m_timer1;
-        QTimer * m_timer2;
-        Health * m_heart[3];
-        Hunger * m_berry[3];
+
         Satisfaction * m_morale;
+        int m_score = 0;
+
+        void setScore(int new_score);
+        int getScore();
 
     public slots:
         void healthChange();
         void eat();
         void starve();
         void happinessChange();
+        void increaseScore();
 };
 
 
