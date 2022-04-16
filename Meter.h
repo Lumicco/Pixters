@@ -15,9 +15,13 @@ class Meter: public QObject
     Q_OBJECT //needs Q_OBJECT macro
 
     private:
+        int m_medicine = 2;
+
         QPushButton * m_feed;
+        QPushButton * m_heal;
         QLabel * m_score_display;
 
+        QTimer * m_medicine_timer;
         QTimer * m_hunger_timer;
         QTimer * m_health_timer;
         QTimer * m_score_timer;
@@ -36,7 +40,9 @@ class Meter: public QObject
         int getScore();
 
     public slots:
-        void healthChange();
+        void healthDecrease();
+        void healthIncrease();
+        void medicineUp();
         void eat();
         void starve();
         void happinessChange();

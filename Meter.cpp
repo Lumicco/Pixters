@@ -20,6 +20,26 @@ Meter::Meter(QGraphicsScene * scene)
 
     connect(m_feed, SIGNAL(clicked()), this, SLOT(eat()));
 
+    //add heal button
+    m_heal = new QPushButton();
+    m_heal->setIcon(QIcon(":/images/Resources/Medicine2.png"));
+    m_heal->setIconSize(QSize(50, 50));
+    m_heal->move(8, 40);
+    m_heal->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));  //transparent background
+    m_heal->setToolTip("Soigner");
+    m_heal->setCursor(Qt::PointingHandCursor);
+
+    m_heal->show();
+
+    scene->addWidget(m_heal);
+
+    connect(m_heal, SIGNAL(clicked()), this, SLOT(healthIncrease()));
+
+    //add timer for medicine increase
+    m_medicine_timer = new QTimer();
+    connect(m_medicine_timer, SIGNAL(timeout()), this, SLOT(medicineUp()));
+    m_medicine_timer->start(10000);
+
     //create score display
     m_score_display = new QLabel();
     m_score_display->setText(QString("Score : ").append("%1").arg(m_score));
@@ -57,7 +77,7 @@ Meter::Meter(QGraphicsScene * scene)
 
     //add timer for stat change
     m_health_timer = new QTimer();
-    connect(m_health_timer, SIGNAL(timeout()), this, SLOT(healthChange()));
+    connect(m_health_timer, SIGNAL(timeout()), this, SLOT(healthDecrease()));
     m_health_timer->start(5000);
 
     //add three strawberries to scene
@@ -109,9 +129,9 @@ Meter::~Meter()
     delete(m_morale);
 }
 
-void Meter::healthChange()
+void Meter::healthDecrease()
 {
-    //reduce number of hearts when berries are depleted
+    //reduce number of hearts by 1 when berries are depleted
     if(m_berry[0]->getHunger() == 0)
     {
         if(m_heart[0]->getHealth() == 3)
@@ -123,6 +143,14 @@ void Meter::healthChange()
         {
             m_heart[1]->healthDown();
             m_heart[0]->setHealth(1);
+
+            //play alert sound
+            QAudioOutput * audioOutput = new QAudioOutput(this);
+            QMediaPlayer * sound = new QMediaPlayer(this);
+            sound->setAudioOutput(audioOutput);
+            audioOutput->setVolume(50);
+            sound->setSource(QUrl("qrc:/sounds/Resources/Sounds/alert.wav"));
+            sound->play();
         }
         else if(m_heart[0]->getHealth() == 1)
         {
@@ -132,9 +160,81 @@ void Meter::healthChange()
     }
 }
 
+void Meter::healthIncrease()
+{
+    //play healing sound
+    QAudioOutput * audioOutput = new QAudioOutput(this);
+    QMediaPlayer * sound = new QMediaPlayer(this);
+    sound->setAudioOutput(audioOutput);
+    audioOutput->setVolume(50);
+    //if medcicine not empty play healing sound
+    if(m_medicine > 0)
+    {
+        sound->setSource(QUrl("qrc:/sounds/Resources/Sounds/bweep.wav"));
+    }
+    //if medicine empty play alert sound
+    else
+    {
+        sound->setSource(QUrl("qrc:/sounds/Resources/Sounds/no_medicine.wav"));
+    }
+    sound->play();
+
+    //do not use medicine if health is full
+    if(m_heart[0]->getHealth() < 3)
+    {
+        //only heal when medicine not empty
+        if(m_medicine != 0)
+        {
+            //increase number of medicines by 1
+            if(m_heart[0]->getHealth() == 0)
+            {
+                m_heart[0]->healthUp();
+                m_heart[0]->setHealth(1);
+            }
+            else if(m_heart[0]->getHealth() == 1)
+            {
+                m_heart[1]->healthUp();
+                m_heart[0]->setHealth(2);
+            }
+            else if(m_heart[0]->getHealth() == 2)
+            {
+                m_heart[2]->healthUp();
+                m_heart[0]->setHealth(3);
+            }
+        }
+
+        //change icon according to number of medicines and deplete medicine
+        if(m_medicine == 2)
+        {
+            m_heal->setIcon(QIcon(":/images/Resources/Medicine1.png"));
+            m_medicine--;
+        }
+        else if(m_medicine == 1)
+        {
+            m_heal->setIcon(QIcon(":/images/Resources/Medicine0.png"));
+            m_medicine--;
+        }
+    }
+}
+
+void Meter::medicineUp()
+{
+    //change icon according to number of medicines and increase medicine
+    if(m_medicine == 0)
+    {
+        m_heal->setIcon(QIcon(":/images/Resources/Medicine1.png"));
+        m_medicine++;
+    }
+    else if(m_medicine == 1)
+    {
+        m_heal->setIcon(QIcon(":/images/Resources/Medicine2.png"));
+        m_medicine++;
+    }
+}
+
 void Meter::starve()
 {
-    //reduce number of berries
+    //reduce number of berries by 1
     if(m_berry[0]->getHunger() == 3)
     {
         m_berry[2]->hungerDown();
@@ -154,7 +254,7 @@ void Meter::starve()
 
 void Meter::eat()
 {
-    //play background music
+    //play eating sound
     QAudioOutput * audioOutput = new QAudioOutput(this);
     QMediaPlayer * sound = new QMediaPlayer(this);
     sound->setAudioOutput(audioOutput);
@@ -162,7 +262,7 @@ void Meter::eat()
     sound->setSource(QUrl("qrc:/sounds/Resources/Sounds/eating.wav"));
     sound->play();
 
-    //increase number of berries
+    //increase number of berries by 1
     if(m_berry[0]->getHunger() == 0)
     {
         m_berry[0]->hungerUp();

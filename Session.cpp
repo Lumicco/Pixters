@@ -42,14 +42,29 @@ Session::Session(QWidget * parent)
     m_contract->setIconSize(QSize(40, 40));
     m_contract->move(600, -20);
     m_contract->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));  //transparent background
-    m_contract->setToolTip("Mentions légales");
+    m_contract->setToolTip("Menu d'administration");
     m_contract->setCursor(Qt::PointingHandCursor);
 
     m_contract->show();
 
     m_scene->addWidget(m_contract);
 
-    connect(m_contract, SIGNAL(clicked()), this, SLOT(showContract()));
+    connect(m_contract, SIGNAL(clicked()), this, SLOT(openAdminMenu()));
+
+    //add admin menu button
+    m_admin_menu = new QPushButton();
+    m_admin_menu->setIcon(QIcon(":/images/Resources/Wrench.png"));
+    m_admin_menu->setIconSize(QSize(38, 38));
+    m_admin_menu->move(550, -18);
+    m_admin_menu->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));  //transparent background
+    m_admin_menu->setToolTip("Mentions légales");
+    m_admin_menu->setCursor(Qt::PointingHandCursor);
+
+    m_admin_menu->show();
+
+    m_scene->addWidget(m_admin_menu);
+
+    connect(m_admin_menu, SIGNAL(clicked()), this, SLOT(showContract()));
 
     //play title screen music
     QAudioOutput * audioOutput = new QAudioOutput(this);
@@ -66,9 +81,20 @@ Session::Session(QWidget * parent)
 
 void Session::setup()
 {
+    //remove start screen buttons
     if(m_start != NULL)
     {
         m_start->hide();
+    }
+
+    if(m_admin_menu != NULL)
+    {
+        m_admin_menu->hide();
+    }
+
+    if(m_contract != NULL)
+    {
+        m_contract->hide();
     }
 
     //enter username
@@ -236,6 +262,7 @@ void Session::gameOver()
     if(m_highscore < score)
     {
         m_highscore = score;
+        m_highscore_user = m_username;
     }
 
     //prepare update statement for high score
@@ -346,6 +373,13 @@ void Session::showContract()
                    "de cette application est autorisée à la condition d\'y mentionner la source. Elles ne peuvent être utilisées à des fins commerciales "
                    "et publicitaires.");
     msgBox.exec();
+}
+
+void Session::openAdminMenu()
+{
+    //m_admin = new Admin();
+
+    //m_admin->menu();
 }
 
 QString Session::getUsername()

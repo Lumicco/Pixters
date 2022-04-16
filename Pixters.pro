@@ -14,6 +14,7 @@ INCLUDEPATH += "C:\Qt\6.2.4\mingw_64\plugins\sqldrivers"
 LIBS += "C:\Qt\6.2.4\mingw_64\bin\libmysql.lib"
 
 SOURCES += \
+    Admin.cpp \
     Health.cpp \
     Hunger.cpp \
     Meter.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    Admin.h \
     Health.h \
     Hunger.h \
     Meter.h \

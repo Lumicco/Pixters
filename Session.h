@@ -8,12 +8,15 @@
 #include <QMediaPlayer>
 #include "Pet.h"
 #include "Meter.h"
+#include "Admin.h"
 
 class Session: public QGraphicsView
 {
     Q_OBJECT //needs Q_OBJECT macro
 
     private:
+        Admin * m_admin;
+
         int m_highscore = 0;
         QString m_highscore_user = "";
 
@@ -24,6 +27,7 @@ class Session: public QGraphicsView
 
         QPushButton * m_start;
         QPushButton * m_contract;
+        QPushButton * m_admin_menu;
 
         Pet * m_pet;
         QLabel * m_name;
@@ -55,6 +59,7 @@ class Session: public QGraphicsView
         void gameOver();
         void restartSession();
         void showContract();
+        void openAdminMenu();
 };
 
 #endif // SESSION_H

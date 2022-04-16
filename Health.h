@@ -20,7 +20,6 @@ class Health: public QObject, public QGraphicsPixmapItem
     public slots:
         void healthUp();
         void healthDown();
-
 };
 
 #endif // HEALTH_H
