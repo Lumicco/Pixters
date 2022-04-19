@@ -185,7 +185,7 @@ void Meter::healthIncrease()
         //only heal when medicine not empty
         if(m_medicine != 0)
         {
-            //increase number of medicines by 1
+            //increase number of hearts by 1
             if(m_heart[0]->getHealth() == 0)
             {
                 m_heart[0]->healthUp();

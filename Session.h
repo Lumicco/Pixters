@@ -16,6 +16,7 @@ class Session: public QGraphicsView
 
     private:
         Admin * m_admin;
+        QString m_password;
 
         int m_highscore = 0;
         QString m_highscore_user = "";
@@ -25,9 +26,12 @@ class Session: public QGraphicsView
         QString m_pet_type;
         QString m_pet_name;
 
-        QPushButton * m_start;
-        QPushButton * m_contract;
-        QPushButton * m_admin_menu;
+        QPushButton * m_start = NULL;
+        QPushButton * m_contract = NULL;
+        QPushButton * m_admin_menu = NULL;
+
+        QPushButton * m_scoreboard = NULL;
+        QPushButton * m_player_list = NULL;
 
         Pet * m_pet;
         QLabel * m_name;
@@ -52,6 +56,8 @@ class Session: public QGraphicsView
         void setUsername(QString username);
         void setPetType(QString pet_type);
         void setPetName(QString pet_name);
+
+        void titleScreen();
 
     public slots:
         void setup();

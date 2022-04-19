@@ -24,6 +24,22 @@ Session::Session(QWidget * parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFixedSize(672,432);
 
+    titleScreen();
+}
+
+void Session::titleScreen()
+{
+    //remove admin menu buttons if necessary
+    if(m_scoreboard != NULL)
+    {
+        m_scoreboard->hide();
+    }
+
+    if(m_player_list != NULL)
+    {
+        m_player_list->hide();
+    }
+
     //set background
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Pixters.png")));
 
@@ -36,6 +52,9 @@ Session::Session(QWidget * parent)
     m_start->show();
     m_scene->addWidget(m_start);
 
+    //start session setup when button is clicked
+    connect(m_start, SIGNAL(clicked()), this, SLOT(setup()));
+
     //add contract button
     m_contract = new QPushButton();
     m_contract->setIcon(QIcon(":/images/Resources/File.png"));
@@ -46,10 +65,9 @@ Session::Session(QWidget * parent)
     m_contract->setCursor(Qt::PointingHandCursor);
 
     m_contract->show();
-
     m_scene->addWidget(m_contract);
 
-    connect(m_contract, SIGNAL(clicked()), this, SLOT(openAdminMenu()));
+    connect(m_contract, SIGNAL(clicked()), this, SLOT(showContract()));
 
     //add admin menu button
     m_admin_menu = new QPushButton();
@@ -61,10 +79,9 @@ Session::Session(QWidget * parent)
     m_admin_menu->setCursor(Qt::PointingHandCursor);
 
     m_admin_menu->show();
-
     m_scene->addWidget(m_admin_menu);
 
-    connect(m_admin_menu, SIGNAL(clicked()), this, SLOT(showContract()));
+    connect(m_admin_menu, SIGNAL(clicked()), this, SLOT(openAdminMenu()));
 
     //play title screen music
     QAudioOutput * audioOutput = new QAudioOutput(this);
@@ -74,14 +91,11 @@ Session::Session(QWidget * parent)
     m_music->setSource(QUrl("qrc:/sounds/Resources/Sounds/title_screen.wav"));
     m_music->setLoops(QMediaPlayer::Infinite);
     m_music->play();
-
-    //start session setup when button is clicked
-    connect(m_start, SIGNAL(clicked()), this, SLOT(setup()));
 }
 
 void Session::setup()
 {
-    //remove start screen buttons
+    //remove start screen buttons if necessary
     if(m_start != NULL)
     {
         m_start->hide();
@@ -138,7 +152,7 @@ void Session::setup()
     db.setHostName("localhost");
     db.setDatabaseName("pixters");
     db.setUserName("root");
-    db.setPassword("AT2jgTMEx-cHeIT9");
+    db.setPassword("AT2jgTMEx-cHeIT9"); //phpMyAdmin password
 
     //open database
     if(!db.open())
@@ -377,9 +391,70 @@ void Session::showContract()
 
 void Session::openAdminMenu()
 {
-    //m_admin = new Admin();
+    //remove start screen buttons  if necessary
+    if(m_start != NULL)
+    {
+        m_start->hide();
+    }
 
-    //m_admin->menu();
+    if(m_admin_menu != NULL)
+    {
+        m_admin_menu->hide();
+    }
+
+    if(m_contract != NULL)
+    {
+        m_contract->hide();
+    }
+
+    //set background
+    setBackgroundBrush(QBrush(QImage(":/images/Resources/Admin_Menu.png")));
+
+    //enter username
+    m_password = QInputDialog::getText(this, "Entrez le mot de passe",
+                                             "Mot de passe:", QLineEdit::Normal);
+
+    if(m_password == "password")
+    {
+        //add scoreboard button
+        m_scoreboard = new QPushButton();
+        m_scoreboard->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
+        m_scoreboard->setIconSize(QSize(250, 130));
+        m_scoreboard->move(200, 40);
+        m_scoreboard->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+        m_scoreboard->setCursor(Qt::PointingHandCursor);
+
+        m_scoreboard->show();
+        m_scene->addWidget(m_scoreboard);
+
+        //show scoreboard when scoreboard button is clicked
+        connect(m_scoreboard, SIGNAL(clicked()), this, SLOT(restartSession()));
+
+        //add player list button
+        m_player_list = new QPushButton();
+        m_player_list->setIcon(QIcon(":/images/Resources/Players.png"));
+        m_player_list->setIconSize(QSize(250, 130));
+        m_player_list->move(200, 180);
+        m_player_list->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+        m_player_list->setCursor(Qt::PointingHandCursor);
+
+        m_player_list->show();
+        m_scene->addWidget(m_player_list);
+
+        //show player list when player list button is clicked
+        connect(m_player_list, SIGNAL(clicked()), this, SLOT(close()));
+    }
+    else
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Mot de passe incorrect.");
+        msgBox.exec();
+
+        m_music->stop();
+
+        titleScreen();
+    }
+
 }
 
 QString Session::getUsername()

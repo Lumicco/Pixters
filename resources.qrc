@@ -27,16 +27,13 @@
         <file>Resources/Medicine0.png</file>
         <file>Resources/Medicine1.png</file>
         <file>Resources/Medicine2.png</file>
+        <file>Resources/Admin_Menu.png</file>
+        <file>Resources/Players.png</file>
+        <file>Resources/Scoreboard.png</file>
     </qresource>
     <qresource prefix="/sounds">
         <file>Resources/Sounds/background_music.wav</file>
-        <file>Resources/Sounds/beep.wav</file>
-        <file>Resources/Sounds/beep2.wav</file>
-        <file>Resources/Sounds/brrrr.wav</file>
         <file>Resources/Sounds/bweep.wav</file>
-        <file>Resources/Sounds/bweep2.wav</file>
-        <file>Resources/Sounds/click.wav</file>
-        <file>Resources/Sounds/click2.wav</file>
         <file>Resources/Sounds/eating.wav</file>
         <file>Resources/Sounds/game_over.wav</file>
         <file>Resources/Sounds/title_screen.wav</file>
