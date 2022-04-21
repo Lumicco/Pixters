@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QDate>
 #include <QMessageBox>
+#include <QCryptographicHash>
 
 #include <QDebug>
 
@@ -30,6 +31,11 @@ Session::Session(QWidget * parent)
 void Session::titleScreen()
 {
     //remove admin menu buttons if necessary
+    if(m_back != NULL)
+    {
+        m_back->hide();
+    }
+
     if(m_scoreboard != NULL)
     {
         m_scoreboard->hide();
@@ -91,6 +97,19 @@ void Session::titleScreen()
     m_music->setSource(QUrl("qrc:/sounds/Resources/Sounds/title_screen.wav"));
     m_music->setLoops(QMediaPlayer::Infinite);
     m_music->play();
+
+    //connect to database
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("pixters");
+    db.setUserName("root");
+    db.setPassword("AT2jgTMEx-cHeIT9"); //phpMyAdmin password
+
+    //open database
+    if(!db.open())
+    {
+        qDebug() << "DB Connect Error: " << db.lastError();
+    }
 }
 
 void Session::setup()
@@ -145,19 +164,6 @@ void Session::setup()
     if(m_pet_name.length() == 0)
     {
         m_pet_name = "Choupette";
-    }
-
-    //connect to database
-    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setDatabaseName("pixters");
-    db.setUserName("root");
-    db.setPassword("AT2jgTMEx-cHeIT9"); //phpMyAdmin password
-
-    //open database
-    if(!db.open())
-    {
-        qDebug() << "DB Connect Error: " << db.lastError();
     }
 
     //initialize variable to store pet id
@@ -411,11 +417,65 @@ void Session::openAdminMenu()
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Admin_Menu.png")));
 
     //enter username
-    m_password = QInputDialog::getText(this, "Entrez le mot de passe",
-                                             "Mot de passe:", QLineEdit::Normal);
+    QString username = QInputDialog::getText(this, "Entrez le nom d'utilisateur",
+                                             "Nom d'utilisateur:", QLineEdit::Normal, "admin");
 
-    if(m_password == "password")
+    //enter password
+    QString password = QInputDialog::getText(this, "Entrez le mot de passe",
+                                             "Mot de passe:", QLineEdit::Password);
+
+    //prepare select statement for root username
+    QSqlQuery get_username;
+    get_username.prepare("SELECT username FROM root");
+
+    //execute statement
+    if(!get_username.exec())
     {
+        qDebug() << "SQL Statement Error: " << get_username.lastError();
+    }
+
+    //store result in variable (0 = column index)
+    while (get_username.next())
+    {
+        m_root = get_username.value(0).toString();
+    }
+
+    //prepare select statement for (hashed) root password
+    QSqlQuery get_password;
+    get_password.prepare("SELECT password FROM root");
+
+    //execute statement
+    if(!get_password.exec())
+    {
+        qDebug() << "SQL Statement Error: " << get_password.lastError();
+    }
+
+    //store result in variable (0 = column index)
+    while (get_password.next())
+    {
+        m_password = get_password.value(0).toString();
+    }
+
+    //hash password entered by user
+    password = QString("%1").arg(QString(QCryptographicHash::hash(password.toUtf8(),QCryptographicHash::Sha1).toHex()));
+
+    //compare hashes
+    if(password == m_password && username == m_root)
+    {
+        //add back button
+        m_back = new QPushButton();
+        m_back->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
+        m_back->setIconSize(QSize(250, 130));
+        m_back->move(50, 40);
+        m_back->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+        m_back->setCursor(Qt::PointingHandCursor);
+
+        m_back->show();
+        m_scene->addWidget(m_back);
+
+        //show scoreboard when scoreboard button is clicked
+        connect(m_back, SIGNAL(clicked()), this, SLOT(titleScreen()));
+
         //add scoreboard button
         m_scoreboard = new QPushButton();
         m_scoreboard->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
@@ -447,7 +507,7 @@ void Session::openAdminMenu()
     else
     {
         QMessageBox msgBox;
-        msgBox.setText("Mot de passe incorrect.");
+        msgBox.setText("Nom d'utilisateur ou mot de passe incorrect.");
         msgBox.exec();
 
         m_music->stop();
