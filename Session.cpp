@@ -10,6 +10,9 @@
 #include <QDate>
 #include <QMessageBox>
 #include <QCryptographicHash>
+#include <QSqlRelationalTableModel>
+#include <QTableView>
+#include <QHeaderView>
 
 #include <QDebug>
 
@@ -30,6 +33,12 @@ Session::Session(QWidget * parent)
 
 void Session::titleScreen()
 {
+    //stop music if already playing
+    if(m_music != NULL)
+    {
+        m_music->stop();
+    }
+
     //remove admin menu buttons if necessary
     if(m_back != NULL)
     {
@@ -103,7 +112,7 @@ void Session::titleScreen()
     db.setHostName("localhost");
     db.setDatabaseName("pixters");
     db.setUserName("root");
-    db.setPassword("AT2jgTMEx-cHeIT9"); //phpMyAdmin password
+    db.setPassword("Sio2022!"); //phpMyAdmin password
 
     //open database
     if(!db.open())
@@ -131,93 +140,125 @@ void Session::setup()
     }
 
     //enter username
+    bool ok;
     m_username = QInputDialog::getText(this, "Entrez votre nom",
-                                             "Votre nom:", QLineEdit::Normal);
+                                             "Votre nom:", QLineEdit::Normal, 0, &ok);
 
-    //initialize username if no name entered
-    if(m_username.length() == 0)
+    //return to title screen on cancel
+    if(ok == false)
     {
-        m_username = "joueur";
+        titleScreen();
     }
-
-    //choose favourite animal
-    QStringList items;
-    items << "Papillon de mer" << "Chien" << "Chat" << "Chenille"
-          << "Papillon" << "Serpent" << "Lézard" << "Autre";
-
-    m_pet_type = QInputDialog::getItem(this, "Quel est votre animal préféré ?",
-                                             "Votre animal préféré:", items, 0, false);
-
-
-    //enter pet name
-    m_pet_name = QInputDialog::getText(this, "Entrez le nom de votre pixter",
-                                             "Le nom de votre pixter:", QLineEdit::Normal);
-
-    //check if pet name is too long
-    while(m_pet_name.length() > 8)
+    else
     {
-        m_pet_name = QInputDialog::getText(this, "Le nom est trop long",
-                                                 "Le nom doit faire moins que 8 caractères:", QLineEdit::Normal);
+        //initialize username if no name entered
+        if(m_username.length() == 0)
+        {
+            m_username = "joueur";
+        }
+
+        //choose favourite animal
+        QStringList items;
+        items << "Papillon de mer" << "Chien" << "Chat" << "Chenille"
+              << "Papillon" << "Serpent" << "Lézard" << "Autre";
+
+        m_pet_type = QInputDialog::getItem(this, "Quel est votre animal préféré ?",
+                                                 "Votre animal préféré:", items, 0, false, &ok);
+
+        //return to title screen on cancel
+        if(ok == false)
+        {
+            titleScreen();
+        }
+        else
+        {
+            //enter pet name
+            m_pet_name = QInputDialog::getText(this, "Entrez le nom de votre pixter",
+                                                     "Le nom de votre pixter:", QLineEdit::Normal, 0, &ok);
+
+            //return to title screen on cancel
+            if(ok == false)
+            {
+                titleScreen();
+            }
+            else
+            {
+                //check if pet name is too long
+                while(m_pet_name.length() > 8)
+                {
+                    m_pet_name = QInputDialog::getText(this, "Le nom est trop long",
+                                                             "Le nom doit faire moins que 8 caractères:", QLineEdit::Normal, 0, &ok);
+                }
+
+                //return to title screen on cancel
+                if(ok == false)
+                {
+                    titleScreen();
+                }
+                else
+                {
+                    //initialize pet name if no name entered
+                    if(m_pet_name.length() == 0)
+                    {
+                        m_pet_name = "Choupette";
+                    }
+
+                    //initialize variable to store pet id
+                    int pet_type = 1;
+
+                    //prepare select statement for pet id
+                    QSqlQuery get_type;
+                    get_type.prepare("SELECT id_pet FROM pets WHERE species like :species");
+                    get_type.bindValue(":species", m_pet_type);
+
+                    //execute statement
+                    if(!get_type.exec())
+                    {
+                        qDebug() << "SQL Statement Error: " << get_type.lastError();
+                    }
+
+                    //store result in variable (0 = column index)
+                    while (get_type.next())
+                    {
+                        pet_type = get_type.value(0).toInt();
+                    }
+
+                    //prepare insert statement
+                    QSqlQuery insert_val;
+                    insert_val.prepare("INSERT INTO users (username, pet_name, id_pet)"
+                                  "VALUES (:username, :pet_name, :id_pet)");
+                    insert_val.bindValue(":username", m_username);
+                    insert_val.bindValue(":pet_name", m_pet_name);
+                    insert_val.bindValue(":id_pet", pet_type);
+
+                    //execute statement
+                    if(!insert_val.exec())
+                    {
+                        qDebug() << "SQL Statement Error: " << insert_val.lastError();
+                    }
+
+                    //prepare select statement for last inserted user id
+                    QSqlQuery get_user;
+                    get_user.prepare("SELECT LAST_INSERT_ID() FROM users");
+
+                    //execute statement
+                    if(!get_user.exec())
+                    {
+                        qDebug() << "SQL Statement Error: " << get_user.lastError();
+                    }
+
+                    //store result in variable (0 = column index)
+                    while (get_user.next())
+                    {
+                        m_id_user = get_user.value(0).toInt();
+                    }
+
+                    //start session after last popup
+                    start();
+                }
+            }
+        }
     }
-
-    //initialize pet name if no name entered
-    if(m_pet_name.length() == 0)
-    {
-        m_pet_name = "Choupette";
-    }
-
-    //initialize variable to store pet id
-    int pet_type = 1;
-
-    //prepare select statement for pet id
-    QSqlQuery get_type;
-    get_type.prepare("SELECT id_pet FROM pets WHERE species like :species");
-    get_type.bindValue(":species", m_pet_type);
-
-    //execute statement
-    if(!get_type.exec())
-    {
-        qDebug() << "SQL Statement Error: " << get_type.lastError();
-    }
-
-    //store result in variable (0 = column index)
-    while (get_type.next())
-    {
-        pet_type = get_type.value(0).toInt();
-    }
-
-    //prepare insert statement
-    QSqlQuery insert_val;
-    insert_val.prepare("INSERT INTO users (username, pet_name, id_pet)"
-                  "VALUES (:username, :pet_name, :id_pet)");
-    insert_val.bindValue(":username", m_username);
-    insert_val.bindValue(":pet_name", m_pet_name);
-    insert_val.bindValue(":id_pet", pet_type);
-
-    //execute statement
-    if(!insert_val.exec())
-    {
-        qDebug() << "SQL Statement Error: " << insert_val.lastError();
-    }
-
-    //prepare select statement for last inserted user id
-    QSqlQuery get_user;
-    get_user.prepare("SELECT LAST_INSERT_ID() FROM users");
-
-    //execute statement
-    if(!get_user.exec())
-    {
-        qDebug() << "SQL Statement Error: " << get_user.lastError();
-    }
-
-    //store result in variable (0 = column index)
-    while (get_user.next())
-    {
-        m_id_user = get_user.value(0).toInt();
-    }
-
-    //start session after last popup
-    start();
 }
 
 void Session::start()
@@ -417,104 +458,181 @@ void Session::openAdminMenu()
     setBackgroundBrush(QBrush(QImage(":/images/Resources/Admin_Menu.png")));
 
     //enter username
+    bool ok;
     QString username = QInputDialog::getText(this, "Entrez le nom d'utilisateur",
-                                             "Nom d'utilisateur:", QLineEdit::Normal, "admin");
+                                             "Nom d'utilisateur:", QLineEdit::Normal, "admin", &ok);
 
-    //enter password
-    QString password = QInputDialog::getText(this, "Entrez le mot de passe",
-                                             "Mot de passe:", QLineEdit::Password);
-
-    //prepare select statement for root username
-    QSqlQuery get_username;
-    get_username.prepare("SELECT username FROM root");
-
-    //execute statement
-    if(!get_username.exec())
+    //return to title screen on cancel
+    if(ok == false)
     {
-        qDebug() << "SQL Statement Error: " << get_username.lastError();
-    }
-
-    //store result in variable (0 = column index)
-    while (get_username.next())
-    {
-        m_root = get_username.value(0).toString();
-    }
-
-    //prepare select statement for (hashed) root password
-    QSqlQuery get_password;
-    get_password.prepare("SELECT password FROM root");
-
-    //execute statement
-    if(!get_password.exec())
-    {
-        qDebug() << "SQL Statement Error: " << get_password.lastError();
-    }
-
-    //store result in variable (0 = column index)
-    while (get_password.next())
-    {
-        m_password = get_password.value(0).toString();
-    }
-
-    //hash password entered by user
-    password = QString("%1").arg(QString(QCryptographicHash::hash(password.toUtf8(),QCryptographicHash::Sha1).toHex()));
-
-    //compare hashes
-    if(password == m_password && username == m_root)
-    {
-        //add back button
-        m_back = new QPushButton();
-        m_back->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
-        m_back->setIconSize(QSize(250, 130));
-        m_back->move(50, 40);
-        m_back->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
-        m_back->setCursor(Qt::PointingHandCursor);
-
-        m_back->show();
-        m_scene->addWidget(m_back);
-
-        //show scoreboard when scoreboard button is clicked
-        connect(m_back, SIGNAL(clicked()), this, SLOT(titleScreen()));
-
-        //add scoreboard button
-        m_scoreboard = new QPushButton();
-        m_scoreboard->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
-        m_scoreboard->setIconSize(QSize(250, 130));
-        m_scoreboard->move(200, 40);
-        m_scoreboard->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
-        m_scoreboard->setCursor(Qt::PointingHandCursor);
-
-        m_scoreboard->show();
-        m_scene->addWidget(m_scoreboard);
-
-        //show scoreboard when scoreboard button is clicked
-        connect(m_scoreboard, SIGNAL(clicked()), this, SLOT(restartSession()));
-
-        //add player list button
-        m_player_list = new QPushButton();
-        m_player_list->setIcon(QIcon(":/images/Resources/Players.png"));
-        m_player_list->setIconSize(QSize(250, 130));
-        m_player_list->move(200, 180);
-        m_player_list->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
-        m_player_list->setCursor(Qt::PointingHandCursor);
-
-        m_player_list->show();
-        m_scene->addWidget(m_player_list);
-
-        //show player list when player list button is clicked
-        connect(m_player_list, SIGNAL(clicked()), this, SLOT(close()));
+        titleScreen();
     }
     else
     {
-        QMessageBox msgBox;
-        msgBox.setText("Nom d'utilisateur ou mot de passe incorrect.");
-        msgBox.exec();
+        //enter password
+        QString password = QInputDialog::getText(this, "Entrez le mot de passe",
+                                                 "Mot de passe:", QLineEdit::Password, 0, &ok);
 
-        m_music->stop();
+        //return to title screen on cancel
+        if(ok == false)
+        {
+            titleScreen();
+        }
+        else
+        {
+            //prepare select statement for root username
+            QSqlQuery get_username;
+            get_username.prepare("SELECT username FROM root");
 
-        titleScreen();
+            //execute statement
+            if(!get_username.exec())
+            {
+                qDebug() << "SQL Statement Error: " << get_username.lastError();
+            }
+
+            //store result in variable (0 = column index)
+            while (get_username.next())
+            {
+                m_root = get_username.value(0).toString();
+            }
+
+            //prepare select statement for (hashed) root password
+            QSqlQuery get_password;
+            get_password.prepare("SELECT password FROM root");
+
+            //execute statement
+            if(!get_password.exec())
+            {
+                qDebug() << "SQL Statement Error: " << get_password.lastError();
+            }
+
+            //store result in variable (0 = column index)
+            while (get_password.next())
+            {
+                m_password = get_password.value(0).toString();
+            }
+
+            //hash password entered by user
+            password = QString("%1").arg(QString(QCryptographicHash::hash(password.toUtf8(),QCryptographicHash::Sha1).toHex()));
+
+            //compare hashes
+            if(password == m_password && username == m_root)
+            {
+                //add back button
+                m_back = new QPushButton();
+                m_back->setIcon(QIcon(":/images/Resources/Door.png"));
+                m_back->setIconSize(QSize(38, 38));
+                m_back->move(5, -18);
+                m_back->setToolTip("Quitter");
+                m_back->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+                m_back->setCursor(Qt::PointingHandCursor);
+
+                m_back->show();
+                m_scene->addWidget(m_back);
+
+                //show scoreboard when scoreboard button is clicked
+                connect(m_back, SIGNAL(clicked()), this, SLOT(titleScreen()));
+
+                //add scoreboard button
+                m_scoreboard = new QPushButton();
+                m_scoreboard->setIcon(QIcon(":/images/Resources/Scoreboard.png"));
+                m_scoreboard->setIconSize(QSize(250, 130));
+                m_scoreboard->move(200, 40);
+                m_scoreboard->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+                m_scoreboard->setCursor(Qt::PointingHandCursor);
+
+                m_scoreboard->show();
+                m_scene->addWidget(m_scoreboard);
+
+                //show scoreboard when scoreboard button is clicked
+                connect(m_scoreboard, SIGNAL(clicked()), this, SLOT(showScoreboard()));
+
+                //add player list button
+                m_player_list = new QPushButton();
+                m_player_list->setIcon(QIcon(":/images/Resources/Players.png"));
+                m_player_list->setIconSize(QSize(250, 130));
+                m_player_list->move(200, 180);
+                m_player_list->setStyleSheet(QString("background-color: rgba(255, 255, 255, 0); color: black;"));
+                m_player_list->setCursor(Qt::PointingHandCursor);
+
+                m_player_list->show();
+                m_scene->addWidget(m_player_list);
+
+                //show player list when player list button is clicked
+                connect(m_player_list, SIGNAL(clicked()), this, SLOT(showUsers()));
+            }
+            else
+            {
+                QMessageBox msgBox;
+                msgBox.setText("Nom d'utilisateur ou mot de passe incorrect.");
+                msgBox.exec();
+
+                titleScreen();
+            }
+        }
     }
+}
 
+void Session::showScoreboard()
+{
+    //create sql relational table model
+    QSqlRelationalTableModel * model;
+    model = new QSqlRelationalTableModel;
+
+    //set up query
+    model->setTable("scores");
+    model->setRelation(3, QSqlRelation("users", "id_user", "username")); //fourth column is a foreign key that maps with id_user from users table, show username field
+    model->setSort(1, Qt::DescendingOrder); //order by score desc
+    model->select();
+
+    //set column names
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Score"));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Date"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Joueur"));
+
+    //create table
+    QTableView * scoreboard = new QTableView;
+    scoreboard->setModel(model);
+    scoreboard->setWindowTitle("Scores");
+    scoreboard->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    //show and set size of table
+    scoreboard->show();
+    scoreboard->hideColumn(0); //hide id column
+    scoreboard->resizeColumnsToContents();
+    scoreboard->setFixedSize(300, 350);
+}
+
+void Session::showUsers()
+{
+    //create sql relational table model
+    QSqlRelationalTableModel * model;
+    model = new QSqlRelationalTableModel;
+
+    //set up query
+    model->setTable("users");
+    model->setRelation(3, QSqlRelation("pets", "id_pet", "species")); //fourth column is a foreign key that maps with id_pet from pets table, show species field
+    model->select();
+
+    //set column names
+    model->setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Nom d'utilisateur"));
+    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Nom du pixter"));
+    model->setHeaderData(3, Qt::Horizontal, QObject::tr("Espèce du pixter"));
+
+    //create table
+    QTableView * users = new QTableView;
+    users->setModel(model);
+    users->setWindowTitle("Joueurs");
+    users->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    //show and set size of table
+    users->show();
+    users->verticalHeader()->hide();
+    users->setSortingEnabled(true);
+    users->resizeColumnsToContents();
+    users->setFixedSize(400, 400);
 }
 
 QString Session::getUsername()
@@ -546,4 +664,3 @@ void Session::setPetName(QString pet_name)
 {
     m_pet_name = pet_name;
 }
-

@@ -37,7 +37,7 @@ class Session: public QGraphicsView
         QLabel * m_name;
         Meter * m_meter;
 
-        QMediaPlayer * m_music;
+        QMediaPlayer * m_music = NULL;
 
         QLabel * m_score_display;
         QLabel * m_highscore_display;
@@ -65,6 +65,8 @@ class Session: public QGraphicsView
         void restartSession();
         void showContract();
         void openAdminMenu();
+        void showScoreboard();
+        void showUsers();
 };
 
 #endif // SESSION_H
