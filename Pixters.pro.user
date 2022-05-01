@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 7.0.0, 2022-04-23T18:58:57. -->
+<!-- Written by QtCreator 7.0.0, 2022-05-01T15:55:28. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -139,8 +139,8 @@
     <value type="int" key="RunSystemFunction">0</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\PC\Desktop\build-Pixters-Desktop_Qt_6_2_4_MinGW_64_bit-Release\release</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/Users/PC/Desktop/build-Pixters-Desktop_Qt_6_2_4_MinGW_64_bit-Release/release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">E:\Documents\Education\BTS\Cours\PPE\PPE 5\Client lourd\Pixters\release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">E:/Documents/Education/BTS/Cours/PPE/PPE 5/Client lourd/Pixters/release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
