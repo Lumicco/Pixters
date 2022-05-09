@@ -430,7 +430,7 @@ void Session::showContract()
 {
     QMessageBox msgBox;
     msgBox.setText("Pixters est édité par Laura Huber.\n"
-                   "Tous les éléments de ce site, y compris les graphismes et les bruitages, ont été créés sur mesure. La reproduction des éléments "
+                   "Tous les éléments de cette application, y compris les graphismes et les bruitages, ont été créés sur mesure. La reproduction des éléments "
                    "de cette application est autorisée à la condition d\'y mentionner la source. Elles ne peuvent être utilisées à des fins commerciales "
                    "et publicitaires.");
     msgBox.exec();
