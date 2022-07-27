@@ -1,0 +1,9 @@
+Driver :
+Mettre    qsqlmysql.dll    dans -----> C:\Qt\6.2.4\mingw_64\plugins\sqldrivers
+
+Connecteur :
+Mettre    libmysql.lib   et   libmysql.dll   dans   ---> C:\Qt\6.2.4\mingw_64\bin
+
+Compiler en mode debug, redémarrer QtCreator si nécessaire
+
+

@@ -1,0 +1,16 @@
+debug/Admin.o
+debug/Health.o
+debug/Hunger.o
+debug/Meter.o
+debug/Pet.o
+debug/Satisfaction.o
+debug/Session.o
+debug/main.o
+debug/qrc_resources.o
+debug/moc_Admin.o
+debug/moc_Health.o
+debug/moc_Hunger.o
+debug/moc_Meter.o
+debug/moc_Pet.o
+debug/moc_Satisfaction.o
+debug/moc_Session.o

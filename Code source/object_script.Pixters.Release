@@ -1,0 +1,16 @@
+release/Admin.o
+release/Health.o
+release/Hunger.o
+release/Meter.o
+release/Pet.o
+release/Satisfaction.o
+release/Session.o
+release/main.o
+release/qrc_resources.o
+release/moc_Admin.o
+release/moc_Health.o
+release/moc_Hunger.o
+release/moc_Meter.o
+release/moc_Pet.o
+release/moc_Satisfaction.o
+release/moc_Session.o
